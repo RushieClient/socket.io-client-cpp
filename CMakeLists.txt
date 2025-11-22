@@ -81,6 +81,9 @@ target_compile_features(sioclient PUBLIC cxx_std_11)
 if(MSVC)
     # MSVC: suppress nodiscard warnings from asio
     target_compile_options(sioclient PRIVATE /wd4834)
+    # Match the main project's runtime library setting (static CRT)
+    set_property(TARGET sioclient PROPERTY MSVC_RUNTIME_LIBRARY 
+        $<IF:$<CONFIG:Debug>,MultiThreadedDebug,MultiThreaded>)
 else()
     # GCC/Clang: suppress various warnings from external libraries
     target_compile_options(sioclient PRIVATE
@@ -121,6 +124,9 @@ if(OPENSSL_FOUND)
     if(MSVC)
         # MSVC: suppress nodiscard warnings from asio
         target_compile_options(sioclient_tls PRIVATE /wd4834)
+        # Match the main project's runtime library setting (static CRT)
+        set_property(TARGET sioclient_tls PROPERTY MSVC_RUNTIME_LIBRARY 
+            $<IF:$<CONFIG:Debug>,MultiThreadedDebug,MultiThreaded>)
     else()
         # GCC/Clang: suppress various warnings from external libraries
         target_compile_options(sioclient_tls PRIVATE

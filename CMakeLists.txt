@@ -77,6 +77,20 @@ target_include_directories(sioclient
 
 target_compile_features(sioclient PUBLIC cxx_std_11)
 
+# Suppress warnings from external dependencies
+if(MSVC)
+    # MSVC: suppress nodiscard warnings from asio
+    target_compile_options(sioclient PRIVATE /wd4834)
+else()
+    # GCC/Clang: suppress various warnings from external libraries
+    target_compile_options(sioclient PRIVATE
+        -Wno-format-overflow              # asio library has format-overflow warnings
+        -Wno-deprecated-declarations      # rapidjson uses deprecated std::iterator, asio uses deprecated sprintf
+        -Wno-expansion-to-defined        # rapidjson macro expansion producing 'defined'
+        -Wno-unqualified-std-cast-call   # macOS clang: unqualified std::move call
+    )
+endif()
+
 find_package(Threads REQUIRED)
 target_link_libraries(sioclient PUBLIC Threads::Threads)
 
@@ -103,6 +117,19 @@ if(OPENSSL_FOUND)
     )
 
     target_compile_features(sioclient_tls PUBLIC cxx_std_11)
+    # Suppress warnings from external dependencies
+    if(MSVC)
+        # MSVC: suppress nodiscard warnings from asio
+        target_compile_options(sioclient_tls PRIVATE /wd4834)
+    else()
+        # GCC/Clang: suppress various warnings from external libraries
+        target_compile_options(sioclient_tls PRIVATE
+            -Wno-format-overflow              # asio library has format-overflow warnings
+            -Wno-deprecated-declarations      # rapidjson uses deprecated std::iterator, asio uses deprecated sprintf
+            -Wno-expansion-to-defined        # rapidjson macro expansion producing 'defined'
+            -Wno-unqualified-std-cast-call   # macOS clang: unqualified std::move call
+        )
+    endif()
     target_link_libraries(sioclient_tls PRIVATE OpenSSL::SSL OpenSSL::Crypto)
     if (NOT USE_SUBMODULES)
         target_link_libraries(sioclient_tls PRIVATE websocketpp::websocketpp asio asio::asio rapidjson)

@@ -11,6 +11,7 @@
 #include <vector>
 #include <map>
 #include <cassert>
+#include <cstdint>
 #include <type_traits>
 namespace sio
 {
